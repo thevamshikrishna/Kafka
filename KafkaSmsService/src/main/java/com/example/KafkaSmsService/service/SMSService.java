@@ -1,6 +1,7 @@
 package com.example.KafkaSmsService.service;
 
 import com.twilio.Twilio;
+import com.twilio.exception.ApiException;
 import com.twilio.rest.api.v2010.account.Message;
 import com.twilio.type.PhoneNumber;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,7 +27,15 @@ public class SMSService {
     }
 
     public void sendSMS(String toNumber, String textMessage) {
-        Message message = Message.creator(new com.twilio.type.PhoneNumber(toNumber), new PhoneNumber(FROM_NUMBER), textMessage).create();
-        System.out.println("SMS sent successfully with SID: " + message.getSid());
+        try {
+            Message message = Message.creator(new PhoneNumber(toNumber), new PhoneNumber(FROM_NUMBER), textMessage).create();
+            System.out.println("SMS sent successfully with SID: " + message.getSid());
+        } catch (ApiException e) {
+            System.err.println("Failed to send SMS: " + e.getMessage());
+            System.err.println("Status code: " + e.getStatusCode());
+            System.err.println("More info: " + e.getMoreInfo());
+            e.printStackTrace();
+        }
     }
+
 }
